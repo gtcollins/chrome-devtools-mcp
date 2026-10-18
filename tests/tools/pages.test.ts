@@ -804,6 +804,7 @@ describe('pages', () => {
     });
     it('selects a page and keeps it focused in the background', async () => {
       await withMcpContext(async (response, context, args) => {
+        await context.getPageById(1).init();
         await context.newPage();
         assert.strictEqual(
           context.getPageById(2),

@@ -241,6 +241,7 @@ describe('script', () => {
         ),
         {message: 'A dialog is open (alert: hello).'},
       );
+      sinon.assert.calledOnceWithExactly(page.init);
       sinon.assert.calledOnceWithExactly(page.throwIfDialogOpen);
       sinon.assert.callOrder(page.init, page.throwIfDialogOpen);
       sinon.assert.notCalled(page.waitForEventsAfterAction);
