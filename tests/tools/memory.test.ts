@@ -152,7 +152,7 @@ describe('memory', () => {
       context.getHeapSnapshotAggregates.resolves(aggregates);
 
       await getHeapSnapshotDetails(args).handler(
-        {params: {filePath: 'test.heapsnapshot'}},
+        {params: {filePath: 'test.heapsnapshot', pageIdx: 0, pageSize: 50}},
         response,
         context,
       );
@@ -166,7 +166,7 @@ describe('memory', () => {
       sinon.assert.calledOnceWithExactly(
         response.setHeapSnapshotAggregates,
         aggregates,
-        {pageIdx: undefined, pageSize: undefined, maxNameLength: undefined},
+        {pageIdx: 0, pageSize: 50, maxNameLength: undefined},
       );
     });
 
@@ -211,7 +211,14 @@ describe('memory', () => {
       context.getHeapSnapshotNodesById.resolves(nodes);
 
       await getHeapSnapshotClassNodes(args).handler(
-        {params: {filePath: 'test.heapsnapshot', id: 19}},
+        {
+          params: {
+            filePath: 'test.heapsnapshot',
+            id: 19,
+            pageIdx: 0,
+            pageSize: 50,
+          },
+        },
         response,
         context,
       );
@@ -224,8 +231,8 @@ describe('memory', () => {
         undefined,
       );
       sinon.assert.calledOnceWithExactly(response.setHeapSnapshotNodes, nodes, {
-        pageIdx: undefined,
-        pageSize: undefined,
+        pageIdx: 0,
+        pageSize: 50,
         maxNameLength: undefined,
       });
     });
@@ -272,7 +279,14 @@ describe('memory', () => {
       context.getHeapSnapshotRetainers.resolves(retainers);
 
       await getHeapSnapshotRetainers(args).handler(
-        {params: {filePath: 'test.heapsnapshot', nodeId: 25341}},
+        {
+          params: {
+            filePath: 'test.heapsnapshot',
+            nodeId: 25341,
+            pageIdx: 0,
+            pageSize: 50,
+          },
+        },
         response,
         context,
       );
@@ -285,7 +299,7 @@ describe('memory', () => {
       sinon.assert.calledOnceWithExactly(
         response.setHeapSnapshotNodes,
         retainers,
-        {pageIdx: undefined, pageSize: undefined, maxNameLength: undefined},
+        {pageIdx: 0, pageSize: 50, maxNameLength: undefined},
       );
     });
 
@@ -492,7 +506,14 @@ describe('memory', () => {
       context.getHeapSnapshotEdges.resolves(edges);
 
       await getHeapSnapshotEdges(args).handler(
-        {params: {filePath: 'test.heapsnapshot', nodeId: 25341}},
+        {
+          params: {
+            filePath: 'test.heapsnapshot',
+            nodeId: 25341,
+            pageIdx: 0,
+            pageSize: 50,
+          },
+        },
         response,
         context,
       );
@@ -508,8 +529,8 @@ describe('memory', () => {
         },
       );
       sinon.assert.calledOnceWithExactly(response.setHeapSnapshotNodes, edges, {
-        pageIdx: undefined,
-        pageSize: undefined,
+        pageIdx: 0,
+        pageSize: 50,
         maxNameLength: undefined,
       });
     });
@@ -589,6 +610,8 @@ describe('memory', () => {
           params: {
             baseFilePath: 'heap1.heapsnapshot',
             currentFilePath: 'heap2.heapsnapshot',
+            pageIdx: 0,
+            pageSize: 50,
           },
         },
         response,
@@ -603,7 +626,7 @@ describe('memory', () => {
       sinon.assert.calledOnceWithExactly(
         response.setHeapSnapshotClassDiffs,
         diff,
-        {pageIdx: undefined, pageSize: undefined, maxNameLength: undefined},
+        {pageIdx: 0, pageSize: 50, maxNameLength: undefined},
       );
     });
 
@@ -644,6 +667,8 @@ describe('memory', () => {
             currentFilePath: 'heap2.heapsnapshot',
             classIndex: 2,
             maxNameLength: 500,
+            pageIdx: 1,
+            pageSize: 5,
           },
         },
         response,
@@ -659,7 +684,7 @@ describe('memory', () => {
       sinon.assert.calledOnceWithExactly(
         response.setHeapSnapshotDetailedClassDiff,
         detailedDiff,
-        {maxNameLength: 500},
+        {pageIdx: 1, pageSize: 5, maxNameLength: 500},
       );
     });
   });
@@ -671,7 +696,7 @@ describe('memory', () => {
       context.getHeapSnapshotDuplicateStrings.resolves(duplicateStrings);
 
       await getHeapSnapshotDuplicateStrings(args).handler(
-        {params: {filePath: 'test.heapsnapshot'}},
+        {params: {filePath: 'test.heapsnapshot', pageIdx: 0, pageSize: 50}},
         response,
         context,
       );
@@ -683,7 +708,7 @@ describe('memory', () => {
       sinon.assert.calledOnceWithExactly(
         response.setHeapSnapshotDuplicateStrings,
         duplicateStrings,
-        {pageIdx: undefined, pageSize: undefined, maxNameLength: undefined},
+        {pageIdx: 0, pageSize: 50, maxNameLength: undefined},
       );
     });
 
@@ -724,7 +749,7 @@ describe('memory', () => {
       context.queryHeapSnapshotObjects.resolves(range);
 
       await queryHeapSnapshotObjects(args).handler(
-        {params: {filePath: 'test.heapsnapshot'}},
+        {params: {filePath: 'test.heapsnapshot', pageIdx: 0, pageSize: 50}},
         response,
         context,
       );
@@ -745,8 +770,8 @@ describe('memory', () => {
         },
       );
       sinon.assert.calledOnceWithExactly(response.setHeapSnapshotNodes, range, {
-        pageIdx: undefined,
-        pageSize: undefined,
+        pageIdx: 0,
+        pageSize: 50,
         maxNameLength: undefined,
       });
     });

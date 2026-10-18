@@ -5,26 +5,14 @@
  */
 
 import assert from 'node:assert';
-import crypto from 'node:crypto';
-import {describe, it, afterEach, beforeEach} from 'node:test';
+import {describe, it} from 'node:test';
 
-import {assertDaemonIsNotRunning, runCli} from '../utils.js';
+import {createCliSession, runCli} from '../utils.js';
 
-describe('chrome-devtools', () => {
-  let sessionId: string;
-
-  beforeEach(async () => {
-    sessionId = crypto.randomUUID();
-    await runCli(['stop'], sessionId);
-    await assertDaemonIsNotRunning(sessionId);
-  });
-
-  afterEach(async () => {
-    await runCli(['stop'], sessionId);
-    await assertDaemonIsNotRunning(sessionId);
-  });
-
-  it('fails to invoke list_network_requests when categoryNetwork is disabled', async () => {
+// Each test uses its own daemon session, so the tests run in parallel.
+describe('chrome-devtools', {concurrency: true}, () => {
+  it('fails to invoke list_network_requests when categoryNetwork is disabled', async t => {
+    const sessionId = createCliSession(t);
     await runCli(['start', '--categoryNetwork=false'], sessionId);
 
     const result = await runCli(['list_network_requests', '1'], sessionId);
@@ -42,7 +30,8 @@ describe('chrome-devtools', () => {
     );
   });
 
-  it('fails to invoke click_at when experimentalVision is disabled (default)', async () => {
+  it('fails to invoke click_at when experimentalVision is disabled (default)', async t => {
+    const sessionId = createCliSession(t);
     await runCli(['start'], sessionId);
 
     const result = await runCli(['click_at', '1', '100', '100'], sessionId);
@@ -59,10 +48,28 @@ describe('chrome-devtools', () => {
     );
   });
 
-  it('fails to invoke evaluate_script when javascriptEvaluation is disabled', async () => {
+  it('fails to invoke evaluate_script when javascriptEvaluation is disabled', async t => {
+    const sessionId = createCliSession(t);
     await runCli(['start', '--no-javascript-evaluation'], sessionId);
 
-    const result = await runCli(['evaluate_script', '() => 1'], sessionId);
+    // The three commands do not change daemon state, so they run in
+    // parallel.
+    const [result, navResult, initScriptResult] = await Promise.all([
+      runCli(['evaluate_script', '() => 1'], sessionId),
+      runCli(['navigate_page', '1', '--url', 'javascript:alert(1)'], sessionId),
+      runCli(
+        [
+          'navigate_page',
+          '1',
+          '--initScript',
+          'alert(1)',
+          '--timeout',
+          'invalid',
+        ],
+        sessionId,
+      ),
+    ]);
+
     assert.strictEqual(result.status, 0);
     assert(
       result.stdout.includes(
@@ -77,10 +84,6 @@ describe('chrome-devtools', () => {
       'restart command suggestion is missing: ' + result.stdout,
     );
 
-    const navResult = await runCli(
-      ['navigate_page', '1', '--url', 'javascript:alert(1)'],
-      sessionId,
-    );
     assert.strictEqual(navResult.status, 0);
     assert(
       navResult.stdout.includes(
@@ -89,17 +92,6 @@ describe('chrome-devtools', () => {
       'error message is unexpected: ' + navResult.stdout,
     );
 
-    const initScriptResult = await runCli(
-      [
-        'navigate_page',
-        '1',
-        '--initScript',
-        'alert(1)',
-        '--timeout',
-        'invalid',
-      ],
-      sessionId,
-    );
     assert.strictEqual(initScriptResult.status, 0);
     assert(
       initScriptResult.stdout.includes(
