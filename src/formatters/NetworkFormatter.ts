@@ -11,6 +11,7 @@ import {
   type HTTPRequest,
   type HTTPResponse,
 } from '../third_party/index.js';
+import {truncateText} from '../utils/text.js';
 
 const BODY_CONTEXT_SIZE_LIMIT = 10000;
 const URL_CONTEXT_SIZE_LIMIT = 255;
@@ -258,10 +259,7 @@ export class NetworkFormatter {
 }
 
 function getSizeLimitedString(text: string, sizeLimit: number): string {
-  if (text.length > sizeLimit) {
-    return text.substring(0, sizeLimit) + '... <truncated>';
-  }
-  return text;
+  return truncateText(text, sizeLimit, {ellipsis: '... <truncated>'});
 }
 
 function convertNetworkRequestConciseToString(

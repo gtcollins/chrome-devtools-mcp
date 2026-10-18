@@ -73,6 +73,7 @@ import type {CD4ACommentThread, PaginationOptions} from './types.js';
 import type {WithSymbolId} from './utils/id.js';
 import {stableIdSymbol} from './utils/id.js';
 import {paginate} from './utils/pagination.js';
+import {truncateText} from './utils/text.js';
 import type {WaitForEventsResult} from './utils/WaitForHelper.js';
 
 const {formatBytesToKb} = DevTools.I18n.ByteUtilities;
@@ -1867,10 +1868,7 @@ Call ${handleDialog(this.#args).name} to handle it before continuing.`);
   }
 }
 function truncateTitle(title: string, maxLength = 50): string {
-  if (title.length <= maxLength) {
-    return title;
-  }
-  return title.slice(0, maxLength - 3) + '...';
+  return truncateText(title, maxLength, {includeEllipsisInLength: true});
 }
 
 const collapseWhitespace = (value: string): string => {
