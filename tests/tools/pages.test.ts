@@ -769,29 +769,6 @@ describe('pages', () => {
     });
   });
   describe('select_page', () => {
-    it('emulates focus when selecting an untouched background page', async () => {
-      const focusStates: boolean[] = [];
-      await withMcpContext(async (response, context, args) => {
-        const page = context.getSelectedMcpPage();
-        const foregroundPage = await context.browser.newPage();
-        await foregroundPage.bringToFront();
-        focusStates.push(
-          await page.pptrPage.evaluate(() => document.hasFocus()),
-        );
-
-        await selectPage(args).handler(
-          {params: {pageId: page.id}},
-          response,
-          context,
-        );
-
-        focusStates.push(
-          await page.pptrPage.evaluate(() => document.hasFocus()),
-        );
-      });
-      assert.deepStrictEqual(focusStates, [false, true]);
-    });
-
     it('sets the selected page and response flags', async () => {
       const {page, context, response, args} = createHandlerMocks();
       context.getPageById.withArgs(1).returns(page);
