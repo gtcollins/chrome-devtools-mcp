@@ -1835,6 +1835,28 @@ export const commands: Commands = {
       },
     },
   },
+  set_logpoints: {
+    description:
+      'Set the logpoints of the selected page. A logpoint logs the value of one or more expressions to the console every time a line of code executes, without pausing execution and without modifying the source code. It works like logpoints in the Chrome DevTools Sources panel and replaces temporarily instrumenting code with console.log() calls. The given list is the complete set of logpoints for the page: logpoints not in the list are removed, new ones are added and the expression of a logpoint at an existing location is replaced; an empty list removes all logpoints. Locations are given as the URL of a script as served to the browser or as an original source file (for example a TypeScript file), which is resolved through the source maps of the parsed scripts and re-resolved automatically when a rebuilt bundle is loaded. The logged output appears as regular console messages that can be read with list_console_messages. Logpoints stay active across page reloads and navigations until they are removed or the page is closed. The response lists the resulting logpoints and where they are bound.',
+    category: 'Debugging',
+    args: {
+      pageId: {
+        name: 'pageId',
+        type: 'number',
+        description: 'Targets a specific page by ID.',
+        required: true,
+        positional: true,
+      },
+      logpoints: {
+        name: 'logpoints',
+        type: 'array',
+        description:
+          'The complete set of logpoints for the page, each formatted as <url>:<lineNumber>[:<columnNumber>] <expression>. The url is the URL of a script as served to the browser or the path of an original source file resolvable through source maps, matched exactly or as a path suffix (e.g. "src/app.ts"). lineNumber and the optional columnNumber are 1-based in the coordinates of the url; a line without executable code moves the logpoint to the next possible location. The expression is formatted like the arguments of console.log() and is evaluated in the scope of the location, so local variables are accessible (for source-mapped locations by their original names). Example: "src/cart.ts:42 \'cart total:\', cart.total, cart.items.length". Pass an empty array to remove all logpoints.',
+        required: true,
+        positional: true,
+      },
+    },
+  },
   take_heapsnapshot: {
     description:
       'Capture a heap snapshot of the target page. Use to analyze the memory distribution of JavaScript objects and debug memory leaks.',

@@ -15,6 +15,8 @@ import {
   type ListenerMap,
   type UncaughtError,
 } from './collectors/PageCollector.js';
+import type {Logpoint, LogpointOptions} from './LogpointManager.js';
+import {LogpointManager} from './LogpointManager.js';
 import {TextSnapshot} from './TextSnapshot.js';
 import {
   type Locator,
@@ -166,6 +168,9 @@ export class McpPage implements ContextPage {
   // Metadata
   isolatedContextName?: string;
   #devtoolsUniverse?: TargetUniverse;
+
+  // Logpoints, created on first use.
+  #logpointManager?: LogpointManager;
 
   // Dialog
   #dialog?: Dialog;
@@ -363,6 +368,35 @@ export class McpPage implements ContextPage {
 
   get devtoolsUniverse(): TargetUniverse | undefined {
     return this.#devtoolsUniverse;
+  }
+
+  #requireDevToolsUniverse(): TargetUniverse {
+    if (!this.#devtoolsUniverse) {
+      throw new Error(
+        `DevTools universe is not available for page ${this.id ?? '?'}.`,
+      );
+    }
+    return this.#devtoolsUniverse;
+  }
+
+  get #logpoints(): LogpointManager {
+    if (!this.#logpointManager) {
+      this.#logpointManager = new LogpointManager(
+        this.#requireDevToolsUniverse(),
+      );
+    }
+    return this.#logpointManager;
+  }
+
+  setLogpoints(logpoints: LogpointOptions[]): Promise<Logpoint[]> {
+    if (!this.#logpointManager && logpoints.length === 0) {
+      return Promise.resolve([]);
+    }
+    return this.#logpoints.setLogpoints(logpoints);
+  }
+
+  getLogpoints(): Logpoint[] {
+    return this.#logpointManager?.getLogpoints() ?? [];
   }
 
   getDialog(): Dialog | undefined {
@@ -674,6 +708,8 @@ export class McpPage implements ContextPage {
     this.#pptrPage?.off('dialog', this.#dialogHandler);
     this.#networkCollector?.dispose();
     this.#consoleCollector?.dispose();
+    this.#logpointManager?.dispose();
+    this.#logpointManager = undefined;
     const devtoolsUniverse = this.#devtoolsUniverse;
     this.#devtoolsUniverse = undefined;
     devtoolsUniverse?.universe.dispose();
