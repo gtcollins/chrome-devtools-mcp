@@ -73,6 +73,7 @@ import type {CD4ACommentThread, PaginationOptions} from './types.js';
 import type {WithSymbolId} from './utils/id.js';
 import {stableIdSymbol} from './utils/id.js';
 import {paginate} from './utils/pagination.js';
+import {truncateText} from './utils/text.js';
 import type {WaitForEventsResult} from './utils/WaitForHelper.js';
 
 const {formatBytesToKb} = DevTools.I18n.ByteUtilities;
@@ -1867,20 +1868,7 @@ Call ${handleDialog(this.#args).name} to handle it before continuing.`);
   }
 }
 function truncateTitle(title: string, maxLength = 50): string {
-  const segmenter = new Intl.Segmenter(undefined, {granularity: 'grapheme'});
-  const segments = Array.from(segmenter.segment(title));
-
-  if (segments.length <= maxLength) {
-    return title;
-  }
-
-  // Slice grapheme clusters without breaking emoji sequences
-  const truncated = segments
-    .slice(0, maxLength - 3)
-    .map(s => s.segment)
-    .join('');
-
-  return truncated + '...';
+  return truncateText(title, maxLength, {includeEllipsisInLength: true});
 }
 
 const collapseWhitespace = (value: string): string => {
